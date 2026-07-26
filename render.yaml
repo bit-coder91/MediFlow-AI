@@ -1,0 +1,12 @@
+# Render 1-Click Production Blueprint for MediFlow AI
+services:
+  - type: web
+    name: mediflow-ai-service
+    env: python
+    buildCommand: pip install -r requirements.txt && python ml/src/train_models.py && python database/init_db.py
+    startCommand: gunicorn server:app --bind 0.0.0.0:$PORT --workers 4 --threads 2 --timeout 120
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.10.12
+      - key: FLASK_ENV
+        value: production

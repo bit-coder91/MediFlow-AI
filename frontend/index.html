@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MediFlow AI</title>
+    <meta name="description" content="MediFlow AI Healthcare Resource & Hospital Intelligence Platform.">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            bg: '#FBF9F6',
+                            sidebar: 'rgba(255, 255, 255, 0.95)',
+                            card: 'rgba(255, 255, 255, 0.92)',
+                            border: 'rgba(45, 138, 138, 0.12)',
+                            primary: '#2D8A8A',
+                            accent: '#F5A285',
+                            text: '#1E232A',
+                            muted: '#4A5568'
+                        },
+                        teal: {
+                            50: '#F4FAFA',
+                            100: '#EBF5F5',
+                            500: '#2D8A8A',
+                            600: '#236B6B'
+                        },
+                        peach: {
+                            50: '#FDF7F5',
+                            100: '#FDF2EE',
+                            500: '#F5A285',
+                            600: '#E48F71'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'Inter', 'sans-serif'],
+                        heading: ['Plus Jakarta Sans', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Leaflet.js Mapping CSS & JS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body class="bg-[#FBF9F6] text-[#1E232A] font-sans min-h-screen">
+    <div class="app-container flex min-h-screen">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar w-64 bg-white/95 border-r border-[#2D8A8A]/10 flex flex-col p-5 fixed h-full z-50 overflow-y-auto backdrop-blur-md">
+            <div class="logo-container flex items-center gap-3 pb-4 border-b border-[#2D8A8A]/10">
+                <div class="w-10 h-10 rounded-2xl bg-[#EBF5F5] border border-[#2D8A8A]/20 flex items-center justify-center text-[#2D8A8A] font-bold shadow-sm">
+                    <svg class="w-5 h-5 text-[#2D8A8A]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/>
+                    </svg>
+                </div>
+                <div class="logo-text">
+                    <h2 class="text-lg font-heading font-extrabold tracking-tight text-[#1E232A]">MediFlow <span class="text-[#2D8A8A]">AI</span></h2>
+                    <span class="text-[11px] text-[#4A5568] block font-medium">Healthcare Network</span>
+                </div>
+            </div>
+            
+            <!-- Access Mode Card -->
+            <div class="mt-4 p-3.5 bg-[#FDF2EE] border border-[#F5A285]/30 rounded-2xl" id="sidebar-auth-card">
+                <div class="flex items-center justify-between mb-1">
+                    <span class="text-[10px] font-bold text-[#D3663E] uppercase tracking-wider" id="sidebar-access-tag">Public Mode</span>
+                    <span class="text-[10px] bg-[#F5A285]/20 text-[#D3663E] px-2 py-0.5 rounded-full font-mono font-semibold" id="sidebar-access-code">GUEST</span>
+                </div>
+                <div class="font-heading font-bold text-xs text-[#1E232A] truncate" id="sidebar-hospital-name">Patient Candidate View</div>
+                <div class="text-[11px] text-[#4A5568] truncate mt-0.5" id="sidebar-hospital-sub">No Credentials Required</div>
+            </div>
+
+            <!-- Navigation Links -->
+            <nav class="nav-menu flex flex-col gap-2 mt-5 flex-1">
+                <div class="px-3 py-1 text-[10px] font-bold text-[#4A5568] uppercase tracking-wider">Patient Care Services</div>
+
+                <button class="nav-item active flex items-center gap-3 px-3.5 py-2.5 rounded-2xl text-[#1E232A] transition text-xs font-semibold w-full text-left" data-tab="tab-patient-discovery">
+                    <svg class="w-4 h-4 text-[#2D8A8A]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                    </svg>
+                    <span>Hospital Directory</span>
+                </button>
+
+                <button class="nav-item flex items-center gap-3 px-3.5 py-2.5 rounded-2xl text-[#4A5568] transition text-xs font-medium w-full text-left" data-tab="tab-google-search">
+                    <svg class="w-4 h-4 text-[#2D8A8A]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L5.595 15.1a2 2 0 00-1.8 1.144l-.32.72a2 2 0 00.316 2.142l1.64 1.764a2 2 0 001.464.63h10.41a2 2 0 001.464-.63l1.64-1.764a2 2 0 00.316-2.142l-.32-.72z"/>
+                    </svg>
+                    <span>Pharmacy & Price Compare</span>
+                </button>
+
+                <button class="nav-item flex items-center gap-3 px-3.5 py-2.5 rounded-2xl text-[#D3663E] transition text-xs font-semibold w-full text-left" data-tab="tab-emergency-mode">
+                    <svg class="w-4 h-4 text-[#F5A285]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                    </svg>
+                    <span>Immediate Emergency Care</span>
+                </button>
+
+                <button class="nav-item flex items-center gap-3 px-3.5 py-2.5 rounded-2xl text-[#4A5568] transition text-xs font-medium w-full text-left" data-tab="tab-blood-search">
+                    <svg class="w-4 h-4 text-[#F5A285]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L5.595 15.1a2 2 0 00-1.8 1.144l-.32.72a2 2 0 00.316 2.142l1.64 1.764a2 2 0 001.464.63h10.41a2 2 0 001.464-.63l1.64-1.764a2 2 0 00.316-2.142l-.32-.72z"/>
+                    </svg>
+                    <span>Blood Bank Directory</span>
+                </button>
+
+                <button class="nav-item flex items-center gap-3 px-3.5 py-2.5 rounded-2xl text-[#4A5568] transition text-xs font-medium w-full text-left" data-tab="tab-public-analytics">
+                    <svg class="w-4 h-4 text-[#2D8A8A]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                    </svg>
+                    <span>Analytical Dashboard</span>
+                    <span class="ml-auto text-[9px] bg-[#EBF5F5] text-[#2D8A8A] px-2 py-0.5 rounded-full font-mono font-bold">PUBLIC</span>
+                </button>
+
+                <div class="my-3 border-t border-[#2D8A8A]/10"></div>
+                <div class="px-3 py-1 text-[10px] font-bold text-[#2D8A8A] uppercase tracking-wider">Hospital Operations</div>
+
+                <!-- GATED HOSPITAL PERSONNEL TAB -->
+                <button class="nav-item flex items-center gap-3 px-3.5 py-2.5 rounded-2xl text-[#2D8A8A] border border-[#2D8A8A]/20 bg-[#EBF5F5] hover:bg-[#2D8A8A] hover:text-white transition text-xs font-semibold w-full text-left" data-tab="tab-hospital-admin">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                    </svg>
+                    <span>Hospital Staff Portal</span>
+                    <span class="ml-auto text-[9px] bg-[#2D8A8A]/20 text-[#2D8A8A] px-2 py-0.5 rounded-full font-mono font-bold" id="nav-staff-badge">LOGIN</span>
+                </button>
+            </nav>
+
+            <div class="sidebar-footer pt-3 border-t border-[#2D8A8A]/10 mt-auto">
+                <div class="flex items-center justify-between p-3 bg-[#F7F4EF] rounded-2xl border border-[#2D8A8A]/10">
+                    <div class="flex items-center gap-2">
+                        <span class="w-2.5 h-2.5 rounded-full bg-[#2D8A8A]"></span>
+                        <div>
+                            <span class="text-[11px] font-bold block text-[#1E232A]">Session Runtime</span>
+                            <span class="text-[10px] text-[#4A5568] block">System Active</span>
+                        </div>
+                    </div>
+                    <span class="text-xs font-mono text-[#2D8A8A] font-bold" id="live-clock">00:00:00</span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content ml-64 flex-1 p-8 max-w-[calc(100vw-16rem)]">
+            <!-- Top Header -->
+            <header class="top-header flex justify-between items-center mb-8">
+                <div>
+                    <h1 class="text-2xl font-heading font-extrabold tracking-tight text-[#1E232A] flex items-center gap-2" id="header-greeting">
+                        Good day! Welcome to MediFlow AI
+                    </h1>
+                    <p class="text-xs text-[#4A5568] mt-1 flex items-center gap-2" id="header-sub">
+                        <span>Smart Healthcare Resource & Hospital Intelligence Platform.</span>
+                    </p>
+                </div>
+                <div class="flex items-center gap-3">
+                    <!-- Quick Trigger: Emergency Mode -->
+                    <button class="px-4 py-2.5 bg-[#FDF2EE] text-[#D3663E] border border-[#F5A285]/40 rounded-full text-xs font-bold hover:bg-[#F5A285] hover:text-white transition flex items-center gap-2 shadow-sm" id="btn-quick-emergency">
+                        <span class="w-2.5 h-2.5 rounded-full bg-[#F5A285]"></span>
+                        <span>Emergency Care</span>
+                    </button>
+
+                    <!-- Dark / Light Mode Switch -->
+                    <button class="w-10 h-10 bg-white text-[#1E232A] border border-[#2D8A8A]/15 rounded-full flex items-center justify-center hover:bg-[#EBF5F5] transition shadow-sm" id="btn-toggle-theme" title="Toggle Theme Mode">
+                        <svg class="w-4 h-4 hidden text-[#2D8A8A]" id="theme-icon-sun" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>
+                        </svg>
+                        <svg class="w-4 h-4 text-[#2D8A8A]" id="theme-icon-moon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>
+                        </svg>
+                    </button>
+
+                    <button class="px-5 py-2.5 bg-[#2D8A8A] text-white rounded-full text-xs font-bold hover:bg-[#236B6B] transition shadow-md" id="btn-global-refresh">Refresh Network</button>
+                    
+                    <div class="h-10 px-4 rounded-full bg-[#EBF5F5] border border-[#2D8A8A]/20 flex items-center justify-center text-xs font-bold text-[#2D8A8A]" id="officer-avatar">GUEST</div>
+                </div>
+            </header>
+
+            <!-- TAB 1: HOSPITAL DIRECTORY & SMART MATCHING -->
+            <section class="tab-content active" id="tab-patient-discovery">
+                <div class="card p-6 bg-white/90 border border-[#2D8A8A]/10 rounded-3xl mb-6 shadow-xl backdrop-blur-md">
+                    <div class="flex justify-between items-center pb-4 border-b border-[#2D8A8A]/10 mb-4">
+                        <div>
+                            <h2 class="text-base font-heading font-bold text-[#1E232A] flex items-center gap-2">
+                                <span>Find Nearby Healthcare & Verified Hospitals</span>
+                                <span class="text-xs bg-[#EBF5F5] text-[#2D8A8A] border border-[#2D8A8A]/20 px-3 py-1 rounded-full font-mono font-bold">DIRECTORY</span>
+                            </h2>
+                            <p class="text-xs text-[#4A5568] mt-1">Search nearby verified hospitals, check real-time bed availability, and calculate priority match scores.</p>
+                        </div>
+                        <button class="px-5 py-2.5 bg-[#2D8A8A] text-white rounded-full text-xs font-bold hover:bg-[#236B6B] transition shadow-md" id="btn-run-ai-rec">
+                            Calculate Priority Match
+                        </button>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                        <div>
+                            <label class="text-xs font-semibold text-[#1E232A] block mb-1">Search Hospital / Area</label>
+                            <input type="text" id="disc-search-input" placeholder="e.g. KEM, Lilavati, Pune..." class="w-full bg-[#F4F1EA] border border-[#2D8A8A]/15 rounded-2xl p-2.5 text-xs text-[#1E232A] outline-none">
+                        </div>
+
+                        <div>
+                            <label class="text-xs font-semibold text-[#1E232A] block mb-1">District / City</label>
+                            <select id="disc-district-select" class="w-full bg-[#F4F1EA] border border-[#2D8A8A]/15 rounded-2xl p-2.5 text-xs text-[#1E232A] outline-none">
+                                <option value="ALL" selected>All Locations</option>
+                                <option value="Mumbai">Mumbai</option>
+                                <option value="Pune">Pune</option>
+                                <option value="Nagpur">Nagpur</option>
+                                <option value="Nashik">Nashik</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="text-xs font-semibold text-[#1E232A] block mb-1">Hospital Type</label>
+                            <select id="disc-type-select" class="w-full bg-[#F4F1EA] border border-[#2D8A8A]/15 rounded-2xl p-2.5 text-xs text-[#1E232A] outline-none">
+                                <option value="ALL" selected>All Categories</option>
+                                <option value="GOVERNMENT_MUNICIPAL">Public / Government</option>
+                                <option value="PRIVATE">Private Specialty</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="text-xs font-semibold text-[#1E232A] block mb-1">Specialty Department</label>
+                            <select id="disc-spec-select" class="w-full bg-[#F4F1EA] border border-[#2D8A8A]/15 rounded-2xl p-2.5 text-xs text-[#1E232A] outline-none">
+                                <option value="ALL" selected>All Specialties</option>
+                                <option value="Cardiology">Cardiology</option>
+                                <option value="Trauma">Emergency & Trauma</option>
+                                <option value="Neurology">Neurology</option>
+                                <option value="Pediatrics">Pediatrics</option>
+                                <option value="General Surgery">General Surgery</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Interactive Leaflet Map -->
+                <div class="card p-4 bg-white/90 border border-[#2D8A8A]/10 rounded-3xl mb-6 shadow-xl backdrop-blur-md">
+                    <div class="flex justify-between items-center mb-3">
+                        <h3 class="text-xs font-heading font-bold text-[#1E232A] flex items-center gap-2">
+                            <span>🗺️ Interactive Map View</span>
+                            <span class="text-[10px] text-[#4A5568] font-normal">Hospital locations & live available capacity</span>
+                        </h3>
+                    </div>
+                    <div id="leaflet-map"></div>
+                </div>
+
+                <!-- Hospital Cards Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="discovery-hospital-cards">
+                    <!-- Populated dynamically via app.js -->
+                </div>
+            </section>
+
+            <!-- TAB 2: ONLINE PHARMACY & MEDICINE PRICE COMPARATOR -->
+            <section class="tab-content hidden" id="tab-google-search">
+                <div class="card p-6 bg-white/90 border border-[#2D8A8A]/10 rounded-3xl mb-6 shadow-xl backdrop-blur-md">
+                    <div class="flex justify-between items-center pb-4 border-b border-[#2D8A8A]/10 mb-4">
+                        <div>
+                            <h2 class="text-base font-heading font-bold text-[#1E232A] flex items-center gap-2">
+                                <span>💊 Online Pharmacy & Medicine Price Comparator</span>
+                                <span class="text-xs bg-[#EBF5F5] text-[#2D8A8A] border border-[#2D8A8A]/20 px-3 py-1 rounded-full font-mono font-bold">PHARMACY LOOKUP</span>
+                            </h2>
+                            <p class="text-xs text-[#4A5568] mt-1">Compare brand prices across platforms (Tata 1mg, PharmEasy, Apollo, Netmeds, Flipkart), auto-find cheapest & best reviewed options, check OTC status, and map nearby chemists with Google Maps pointers.</p>
+                        </div>
+                    </div>
+
+                    <form id="form-google-web-search" class="flex flex-col gap-3">
+                        <div class="flex gap-3">
+                            <input type="text" id="google-search-query" placeholder="Type medicine or brand name (e.g. Paracetamol 500mg, Crocin, Dolo 650, Cetirizine, Amoxicillin)..." class="flex-1 bg-[#F4F1EA] border border-[#2D8A8A]/15 rounded-2xl p-3 text-xs text-[#1E232A] outline-none" required>
+                            <button type="submit" class="px-6 py-3 bg-[#2D8A8A] text-white font-bold rounded-full hover:bg-[#236B6B] transition text-xs flex items-center gap-2 shadow-md">
+                                <span>Compare Prices</span>
+                            </button>
+                        </div>
+                        <div class="flex flex-wrap gap-2 text-xs text-[#4A5568] items-center mt-1">
+                            <span class="font-medium text-[11px]">Quick Searches:</span>
+                            <button type="button" class="btn-quick-med px-3 py-1 bg-[#EBF5F5] text-[#2D8A8A] border border-[#2D8A8A]/20 rounded-full hover:bg-[#2D8A8A] hover:text-white transition text-[11px] font-semibold">Paracetamol 500mg</button>
+                            <button type="button" class="btn-quick-med px-3 py-1 bg-[#EBF5F5] text-[#2D8A8A] border border-[#2D8A8A]/20 rounded-full hover:bg-[#2D8A8A] hover:text-white transition text-[11px] font-semibold">Crocin 650</button>
+                            <button type="button" class="btn-quick-med px-3 py-1 bg-[#EBF5F5] text-[#2D8A8A] border border-[#2D8A8A]/20 rounded-full hover:bg-[#2D8A8A] hover:text-white transition text-[11px] font-semibold">Dolo 650</button>
+                            <button type="button" class="btn-quick-med px-3 py-1 bg-[#EBF5F5] text-[#2D8A8A] border border-[#2D8A8A]/20 rounded-full hover:bg-[#2D8A8A] hover:text-white transition text-[11px] font-semibold">Cetirizine 10mg</button>
+                            <button type="button" class="btn-quick-med px-3 py-1 bg-[#EBF5F5] text-[#2D8A8A] border border-[#2D8A8A]/20 rounded-full hover:bg-[#2D8A8A] hover:text-white transition text-[11px] font-semibold">Combiflam</button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Interactive Pharmacy Map with Google Maps Pointers -->
+                <div class="card p-4 bg-white/90 border border-[#2D8A8A]/10 rounded-3xl mb-6 shadow-xl backdrop-blur-md hidden" id="pharmacy-map-container">
+                    <div class="flex justify-between items-center mb-3">
+                        <h3 class="text-xs font-heading font-bold text-[#1E232A] flex items-center gap-2">
+                            <span>📍 Nearby Pharmacies & Google Maps Pointers</span>
+                            <span class="text-[10px] text-[#4A5568]">Click any store marker or Google Maps link for direct navigation pointers</span>
+                        </h3>
+                    </div>
+                    <div id="pharmacy-leaflet-map" style="height:260px; width:100%; border-radius:18px;"></div>
+                </div>
+
+                <div class="space-y-6" id="google-search-results-cards">
+                    <div class="p-8 text-center bg-white/60 border border-[#2D8A8A]/10 rounded-3xl text-[#4A5568] text-xs">
+                        Enter a medicine name above to compare prices across Tata 1mg, PharmEasy, Apollo, Netmeds & Flipkart Health+, auto-highlight cheapest & best reviewed options, and view nearby chemist Google Maps pointers.
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 3: 1-CLICK EMERGENCY MODE -->
+            <section class="tab-content hidden" id="tab-emergency-mode">
+                <div class="card p-6 bg-[#FDF2EE] border-2 border-[#F5A285]/30 rounded-3xl mb-6 shadow-xl">
+                    <div class="flex justify-between items-center pb-4 border-b border-[#F5A285]/30">
+                        <div>
+                            <h2 class="text-base font-heading font-bold text-[#D3663E] flex items-center gap-2">
+                                <span class="w-2.5 h-2.5 rounded-full bg-[#F5A285]"></span>
+                                🚨 Immediate Emergency Care & ICU Finder
+                            </h2>
+                            <p class="text-xs text-[#4A5568] mt-1">Priority emergency triage matching nearest hospitals with verified ICU capacity and travel time.</p>
+                        </div>
+                        <span class="text-xs font-mono font-bold bg-[#F5A285] text-white px-3.5 py-1 rounded-full shadow-sm">EMERGENCY ACTIVE</span>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-4">
+                        <div>
+                            <label class="text-xs font-semibold text-[#1E232A] block mb-1">Emergency Medical Condition</label>
+                            <select id="emerg-specialty-select" class="w-full bg-white border border-[#F5A285]/40 rounded-2xl p-2.5 text-xs text-[#1E232A] outline-none">
+                                <option value="Cardiac Arrest / Heart Attack" selected>Heart Attack / Chest Pain</option>
+                                <option value="Acute Stroke / Cerebrovascular">Stroke / Brain Emergency</option>
+                                <option value="Polytrauma / Road Accident">Accident / Trauma</option>
+                                <option value="Severe Respiratory Failure">Breathing Failure / Oxygen Needed</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="text-xs font-semibold text-[#1E232A] block mb-1">Required Blood Group</label>
+                            <select id="emerg-blood-select" class="w-full bg-white border border-[#F5A285]/40 rounded-2xl p-2.5 text-xs text-[#1E232A] outline-none">
+                                <option value="O+" selected>O Positive (O+)</option>
+                                <option value="O-">O Negative (O- Universal)</option>
+                                <option value="A+">A Positive (A+)</option>
+                                <option value="B+">B Positive (B+)</option>
+                                <option value="AB+">AB Positive (AB+)</option>
+                            </select>
+                        </div>
+
+                        <div class="flex items-end">
+                            <button class="w-full py-3 bg-[#F5A285] text-white rounded-full font-bold hover:bg-[#E48F71] transition text-xs flex items-center justify-center gap-2 shadow-md" id="btn-trigger-emerg-triage">
+                                <span>Find Emergency ICU</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="emergency-ranked-cards">
+                    <!-- Populated via app.js -->
+                </div>
+            </section>
+
+            <!-- TAB 4: OFFICIAL BLOOD BANK DIRECTORY -->
+            <section class="tab-content hidden" id="tab-blood-search">
+                <div class="card p-6 bg-white/90 border border-[#2D8A8A]/10 rounded-3xl mb-6 shadow-xl backdrop-blur-md">
+                    <div class="flex justify-between items-center pb-4 border-b border-[#2D8A8A]/10 mb-4">
+                        <div>
+                            <h2 class="text-base font-heading font-bold text-[#1E232A] flex items-center gap-2">
+                                <span>🩸 Compassionate Blood Bank Locator</span>
+                                <span class="text-xs bg-[#FDF2EE] text-[#D3663E] border border-[#F5A285]/30 px-3 py-1 rounded-full font-mono font-bold">BLOOD BANK</span>
+                            </h2>
+                            <p class="text-xs text-[#4A5568] mt-1">Search available blood inventory and units across verified blood bank centers.</p>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <div>
+                            <label class="text-xs font-semibold text-[#1E232A] block mb-1">Blood Group</label>
+                            <select id="blood-group-select" class="w-full bg-[#F4F1EA] border border-[#2D8A8A]/15 rounded-2xl p-2.5 text-xs text-[#1E232A] outline-none">
+                                <option value="O+" selected>O Positive (O+)</option>
+                                <option value="O-">O Negative (O-)</option>
+                                <option value="A+">A Positive (A+)</option>
+                                <option value="A-">A Negative (A-)</option>
+                                <option value="B+">B Positive (B+)</option>
+                                <option value="B-">B Negative (B-)</option>
+                                <option value="AB+">AB Positive (AB+)</option>
+                                <option value="AB-">AB Negative (AB-)</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="text-xs font-semibold text-[#1E232A] block mb-1">Location / District</label>
+                            <select id="blood-district-select" class="w-full bg-[#F4F1EA] border border-[#2D8A8A]/15 rounded-2xl p-2.5 text-xs text-[#1E232A] outline-none">
+                                <option value="ALL" selected>All Locations</option>
+                                <option value="Mumbai">Mumbai</option>
+                                <option value="Pune">Pune</option>
+                                <option value="Nagpur">Nagpur</option>
+                                <option value="Nashik">Nashik</option>
+                            </select>
+                        </div>
+
+                        <div class="flex items-end">
+                            <button class="w-full py-3 bg-[#2D8A8A] text-white rounded-full font-bold hover:bg-[#236B6B] transition text-xs shadow-md" id="btn-search-blood-inventory">
+                                Search Blood Inventory
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4" id="blood-search-results">
+                    <!-- Populated via app.js -->
+                </div>
+            </section>
+
+            <!-- TAB 5: REGISTER NEW HOSPITAL -->
+            <section class="tab-content hidden" id="tab-register-hospital">
+                <div class="card p-6 bg-white/90 border border-[#2D8A8A]/10 rounded-3xl mb-6 max-w-2xl mx-auto shadow-xl backdrop-blur-md">
+                    <div class="mb-5 pb-4 border-b border-[#2D8A8A]/10">
+                        <h2 class="text-base font-heading font-bold text-[#1E232A] flex items-center gap-2">
+                            <span>➕ Register Hospital on MediFlow AI</span>
+                            <span class="text-xs bg-[#EBF5F5] text-[#2D8A8A] border border-[#2D8A8A]/20 px-3 py-1 rounded-full font-mono font-bold">REGISTRATION</span>
+                        </h2>
+                        <p class="text-xs text-[#4A5568] mt-1">Register a new healthcare facility to the public directory for patient discovery.</p>
+                    </div>
+
+                    <form id="form-register-new-hospital" class="space-y-4">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div class="flex flex-col gap-1">
+                                <label class="text-xs font-semibold text-[#1E232A]">Hospital Full Name *</label>
+                                <input type="text" id="reg-name" placeholder="e.g. Sahyadri Super Specialty Hospital" class="bg-[#F4F1EA] border border-[#2D8A8A]/15 rounded-2xl p-2.5 text-xs text-[#1E232A] outline-none" required>
+                            </div>
+                            <div class="flex flex-col gap-1">
+                                <label class="text-xs font-semibold text-[#1E232A]">District / City *</label>
+                                <input type="text" id="reg-district" placeholder="e.g. Pune, Mumbai, Thane, Nashik..." class="bg-[#F4F1EA] border border-[#2D8A8A]/15 rounded-2xl p-2.5 text-xs text-[#1E232A] outline-none" required>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div class="flex flex-col gap-1">
+                                <label class="text-xs font-semibold text-[#1E232A]">Category</label>
+                                <select id="reg-type" class="bg-[#F4F1EA] border border-[#2D8A8A]/15 rounded-2xl p-2.5 text-xs text-[#1E232A] outline-none">
+                                    <option value="PRIVATE" selected>Private Hospital</option>
+                                    <option value="GOVERNMENT_MUNICIPAL">Government / Public Hospital</option>
+                                    <option value="TRUST">Charitable Trust Hospital</option>
+                                </select>
+                            </div>
+                            <div class="flex flex-col gap-1">
+                                <label class="text-xs font-semibold text-[#1E232A]">Emergency Phone Helpline *</label>
+                                <input type="text" id="reg-helpline" placeholder="e.g. +91 (20) 6726-0000" class="bg-[#F4F1EA] border border-[#2D8A8A]/15 rounded-2xl p-2.5 text-xs text-[#1E232A] outline-none" required>
+                            </div>
+                        </div>
+
+                        <div class="flex flex-col gap-1">
+                            <label class="text-xs font-semibold text-[#1E232A]">Full Address *</label>
+                            <input type="text" id="reg-address" placeholder="Street address, landmark, PIN code" class="bg-[#F4F1EA] border border-[#2D8A8A]/15 rounded-2xl p-2.5 text-xs text-[#1E232A] outline-none" required>
+                        </div>
+
+                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                            <div class="flex flex-col gap-1">
+                                <label class="text-xs font-semibold text-[#1E232A]">Total Beds</label>
+                                <input type="number" id="reg-total-beds" class="bg-[#F4F1EA] border border-[#2D8A8A]/15 rounded-2xl p-2 text-xs font-semibold" value="200">
+                            </div>
+                            <div class="flex flex-col gap-1">
+                                <label class="text-xs font-semibold text-[#1E232A]">Available Beds</label>
+                                <input type="number" id="reg-avail-beds" class="bg-[#F4F1EA] border border-[#2D8A8A]/15 rounded-2xl p-2 text-xs font-semibold" value="50">
+                            </div>
+                            <div class="flex flex-col gap-1">
+                                <label class="text-xs font-semibold text-[#1E232A]">ICU Beds</label>
+                                <input type="number" id="reg-icu-avail" class="bg-[#F4F1EA] border border-[#2D8A8A]/15 rounded-2xl p-2 text-xs font-semibold" value="10">
+                            </div>
+                            <div class="flex flex-col gap-1">
+                                <label class="text-xs font-semibold text-[#1E232A]">Staff Access PIN *</label>
+                                <input type="password" id="reg-pin" placeholder="e.g. 1234" class="bg-[#F4F1EA] border border-[#2D8A8A]/15 rounded-2xl p-2 text-xs font-mono" required>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="w-full py-3 bg-[#2D8A8A] text-white rounded-full font-bold hover:bg-[#236B6B] transition text-xs shadow-md">
+                            Register Hospital
+                        </button>
+                    </form>
+                </div>
+            </section>
+
+            <!-- TAB 5: PUBLIC HEALTH INTELLIGENCE DASHBOARD -->
+            <section class="tab-content hidden" id="tab-public-analytics">
+                <!-- Dashboard Header: State Summary (Maharashtra) -->
+                <div class="card p-6 bg-white/90 border border-[#2D8A8A]/10 rounded-3xl mb-6 shadow-xl backdrop-blur-md">
+                    <div class="flex justify-between items-center pb-4 border-b border-[#2D8A8A]/10 mb-4">
+                        <div>
+                            <h2 class="text-base font-heading font-extrabold text-[#1E232A] flex items-center gap-2">
+                                <span id="pub-summary-title">🏥 State Summary (Maharashtra)</span>
+                                <span id="pub-summary-badge" class="text-xs bg-[#EBF5F5] text-[#2D8A8A] border border-[#2D8A8A]/20 px-3 py-1 rounded-full font-mono font-bold">STATEWIDE INTELLIGENCE</span>
+                            </h2>
+                            <p id="pub-summary-subtitle" class="text-xs text-[#4A5568] mt-1">Aggregated state-wide metrics for hospital beds, ICU capacity, blood bank inventory, and patient care demand trends across Maharashtra.</p>
+                        </div>
+                    </div>
+
+                    <!-- 4 Metric KPI Cards -->
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <div class="p-4 bg-[#F4F1EA] border border-[#2D8A8A]/10 rounded-2xl">
+                            <span class="text-[10px] text-[#4A5568] uppercase font-bold block">Network Capacity</span>
+                            <span class="text-xl font-heading font-extrabold text-[#1E232A]" id="pub-kpi-beds">1,850</span>
+                            <span class="text-[10px] text-[#2D8A8A] font-medium block mt-0.5" id="pub-kpi-avail-beds">435 Beds Available</span>
+                        </div>
+
+                        <div class="p-4 bg-[#EBF5F5] border border-[#2D8A8A]/20 rounded-2xl">
+                            <span class="text-[10px] text-[#2D8A8A] uppercase font-bold block">Available ICU Beds</span>
+                            <span class="text-xl font-heading font-extrabold text-[#2D8A8A]" id="pub-kpi-icu">78</span>
+                            <span class="text-[10px] text-[#2D8A8A] font-medium block mt-0.5">Across 8 Hospitals</span>
+                        </div>
+
+                        <div class="p-4 bg-[#FDF2EE] border border-[#F5A285]/30 rounded-2xl">
+                            <span class="text-[10px] text-[#D3663E] uppercase font-bold block">Blood Bank Stock</span>
+                            <span class="text-xl font-heading font-extrabold text-[#D3663E]" id="pub-kpi-blood">1,240 Litres</span>
+                            <span class="text-[10px] text-[#D3663E] font-medium block mt-0.5">All Groups Tracked</span>
+                        </div>
+
+                        <div class="p-4 bg-white border border-[#2D8A8A]/15 rounded-2xl">
+                            <span class="text-[10px] text-[#4A5568] uppercase font-bold block">Projected Bed Occupancy</span>
+                            <span class="text-xl font-heading font-extrabold text-[#1E232A]" id="pub-kpi-occupancy">76.5%</span>
+                            <span class="text-[10px] text-emerald-600 font-bold block mt-0.5">Normal Operating Range</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Comprehensive Resource KPI Metric Cards & District Filter Panel -->
+                <div class="card p-6 bg-white/90 border border-[#2D8A8A]/10 rounded-3xl mb-6 shadow-xl backdrop-blur-md">
+
+                    <!-- 2. Pre-Populated KPI Metric Cards & Progress Gauges Section -->
+                    <div class="pt-5 border-t border-[#2D8A8A]/15 mt-6">
+                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4">
+                            <div>
+                                <h4 class="text-xs font-heading font-extrabold text-[#1E232A] uppercase tracking-wider flex items-center gap-2">
+                                    <span>📋 Comprehensive Resource KPI Metric Cards</span>
+                                    <span class="text-[10px] bg-[#2D8A8A] text-white px-2.5 py-0.5 rounded-full font-bold">PRE-LOADED DATA</span>
+                                </h4>
+                                <p class="text-xs text-[#4A5568] mt-0.5">Filter resource metrics and pre-loaded data by Maharashtra district level.</p>
+                            </div>
+
+                            <!-- District-Wise Dropdown Filter -->
+                            <div class="flex items-center gap-2">
+                                <label for="kpi-district-filter" class="text-xs font-bold text-[#1E232A] whitespace-nowrap">Filter District:</label>
+                                <select id="kpi-district-filter" class="bg-[#F4F1EA] border border-[#2D8A8A]/20 rounded-2xl px-3 py-1.5 text-xs text-[#1E232A] font-bold outline-none shadow-sm cursor-pointer hover:border-[#2D8A8A]">
+                                    <option value="ALL" selected>All Maharashtra Districts</option>
+                                    <option value="Mumbai">Mumbai District</option>
+                                    <option value="Pune">Pune District</option>
+                                    <option value="Nagpur">Nagpur District</option>
+                                    <option value="Nashik">Nashik District</option>
+                                    <option value="Thane">Thane District</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- 1. Blood Group Demand vs Supply KPI Grid (Pre-populated) -->
+                        <div class="mb-6">
+                            <h5 class="text-xs font-bold text-[#2D8A8A] mb-3 uppercase tracking-wide">🩸 Blood Group Litres Supply & 7-Day Demand Forecast</h5>
+                            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3" id="kpi-grid-blood-demand-supply">
+                                <div class="p-3.5 bg-white border border-[#2D8A8A]/15 rounded-2xl shadow-sm flex flex-col justify-between">
+                                    <div><div class="flex justify-between items-center mb-1"><span class="font-heading font-extrabold text-sm text-[#1E232A]">O+</span><span class="text-[9px] font-bold px-2 py-0.5 rounded-full bg-[#EBF5F5] text-[#2D8A8A] border border-[#2D8A8A]/20">SAFE_STOCK</span></div><div class="text-base font-extrabold text-[#2D8A8A] font-mono mt-1">171 Litres <span class="text-[10px] text-[#4A5568] font-normal">Stock</span></div><div class="text-[10px] text-[#4A5568] mt-0.5">7-Day Demand: <strong class="font-mono text-[#1E232A]">144 Litres</strong></div><div class="w-full bg-[#F4F1EA] h-2 rounded-full mt-2 overflow-hidden"><div class="h-full bg-[#2D8A8A]" style="width: 100%"></div></div></div><div class="pt-2 border-t border-[#2D8A8A]/10 mt-2 text-[10px] font-bold text-[#2D8A8A]">✅ Reserve Surplus: +27 Litres</div>
+                                </div>
+                                <div class="p-3.5 bg-white border border-[#2D8A8A]/15 rounded-2xl shadow-sm flex flex-col justify-between">
+                                    <div><div class="flex justify-between items-center mb-1"><span class="font-heading font-extrabold text-sm text-[#1E232A]">A+</span><span class="text-[9px] font-bold px-2 py-0.5 rounded-full bg-[#EBF5F5] text-[#2D8A8A] border border-[#2D8A8A]/20">SAFE_STOCK</span></div><div class="text-base font-extrabold text-[#2D8A8A] font-mono mt-1">130.5 Litres <span class="text-[10px] text-[#4A5568] font-normal">Stock</span></div><div class="text-[10px] text-[#4A5568] mt-0.5">7-Day Demand: <strong class="font-mono text-[#1E232A]">112.5 Litres</strong></div><div class="w-full bg-[#F4F1EA] h-2 rounded-full mt-2 overflow-hidden"><div class="h-full bg-[#2D8A8A]" style="width: 100%"></div></div></div><div class="pt-2 border-t border-[#2D8A8A]/10 mt-2 text-[10px] font-bold text-[#2D8A8A]">✅ Reserve Surplus: +18 Litres</div>
+                                </div>
+                                <div class="p-3.5 bg-white border border-[#2D8A8A]/15 rounded-2xl shadow-sm flex flex-col justify-between">
+                                    <div><div class="flex justify-between items-center mb-1"><span class="font-heading font-extrabold text-sm text-[#1E232A]">B+</span><span class="text-[9px] font-bold px-2 py-0.5 rounded-full bg-[#EBF5F5] text-[#2D8A8A] border border-[#2D8A8A]/20">SAFE_STOCK</span></div><div class="text-base font-extrabold text-[#2D8A8A] font-mono mt-1">139.5 Litres <span class="text-[10px] text-[#4A5568] font-normal">Stock</span></div><div class="text-[10px] text-[#4A5568] mt-0.5">7-Day Demand: <strong class="font-mono text-[#1E232A]">121.5 Litres</strong></div><div class="w-full bg-[#F4F1EA] h-2 rounded-full mt-2 overflow-hidden"><div class="h-full bg-[#2D8A8A]" style="width: 100%"></div></div></div><div class="pt-2 border-t border-[#2D8A8A]/10 mt-2 text-[10px] font-bold text-[#2D8A8A]">✅ Reserve Surplus: +18 Litres</div>
+                                </div>
+                                <div class="p-3.5 bg-white border border-[#2D8A8A]/15 rounded-2xl shadow-sm flex flex-col justify-between">
+                                    <div><div class="flex justify-between items-center mb-1"><span class="font-heading font-extrabold text-sm text-[#1E232A]">AB+</span><span class="text-[9px] font-bold px-2 py-0.5 rounded-full bg-[#EBF5F5] text-[#2D8A8A] border border-[#2D8A8A]/20">SAFE_STOCK</span></div><div class="text-base font-extrabold text-[#2D8A8A] font-mono mt-1">54 Litres <span class="text-[10px] text-[#4A5568] font-normal">Stock</span></div><div class="text-[10px] text-[#4A5568] mt-0.5">7-Day Demand: <strong class="font-mono text-[#1E232A]">49.5 Litres</strong></div><div class="w-full bg-[#F4F1EA] h-2 rounded-full mt-2 overflow-hidden"><div class="h-full bg-[#2D8A8A]" style="width: 100%"></div></div></div><div class="pt-2 border-t border-[#2D8A8A]/10 mt-2 text-[10px] font-bold text-[#2D8A8A]">✅ Reserve Surplus: +4.5 Litres</div>
+                                </div>
+                                <div class="p-3.5 bg-[#FDF2EE] border border-[#F5A285]/40 rounded-2xl shadow-sm flex flex-col justify-between">
+                                    <div><div class="flex justify-between items-center mb-1"><span class="font-heading font-extrabold text-sm text-[#D3663E]">O-</span><span class="text-[9px] font-bold px-2 py-0.5 rounded-full bg-[#FDF2EE] text-[#D3663E] border border-[#F5A285]/30">CRITICAL_DEFICIT</span></div><div class="text-base font-extrabold text-[#D3663E] font-mono mt-1">29.2 Litres <span class="text-[10px] text-[#4A5568] font-normal">Stock</span></div><div class="text-[10px] text-[#4A5568] mt-0.5">7-Day Demand: <strong class="font-mono text-[#1E232A]">36 Litres</strong></div><div class="w-full bg-[#F4F1EA] h-2 rounded-full mt-2 overflow-hidden"><div class="h-full bg-[#D3663E]" style="width: 81%"></div></div></div><div class="pt-2 border-t border-[#2D8A8A]/10 mt-2 text-[10px] font-bold text-[#D3663E]">⚠️ Deficit: 6.8 Litres</div>
+                                </div>
+                                <div class="p-3.5 bg-[#FDF2EE] border border-[#F5A285]/40 rounded-2xl shadow-sm flex flex-col justify-between">
+                                    <div><div class="flex justify-between items-center mb-1"><span class="font-heading font-extrabold text-sm text-[#D3663E]">A-</span><span class="text-[9px] font-bold px-2 py-0.5 rounded-full bg-[#FDF2EE] text-[#D3663E] border border-[#F5A285]/30">CRITICAL_DEFICIT</span></div><div class="text-base font-extrabold text-[#D3663E] font-mono mt-1">20.2 Litres <span class="text-[10px] text-[#4A5568] font-normal">Stock</span></div><div class="text-[10px] text-[#4A5568] mt-0.5">7-Day Demand: <strong class="font-mono text-[#1E232A]">27 Litres</strong></div><div class="w-full bg-[#F4F1EA] h-2 rounded-full mt-2 overflow-hidden"><div class="h-full bg-[#D3663E]" style="width: 75%"></div></div></div><div class="pt-2 border-t border-[#2D8A8A]/10 mt-2 text-[10px] font-bold text-[#D3663E]">⚠️ Deficit: 6.8 Litres</div>
+                                </div>
+                                <div class="p-3.5 bg-[#FDF2EE] border border-[#F5A285]/40 rounded-2xl shadow-sm flex flex-col justify-between">
+                                    <div><div class="flex justify-between items-center mb-1"><span class="font-heading font-extrabold text-sm text-[#D3663E]">B-</span><span class="text-[9px] font-bold px-2 py-0.5 rounded-full bg-[#FDF2EE] text-[#D3663E] border border-[#F5A285]/30">CRITICAL_DEFICIT</span></div><div class="text-base font-extrabold text-[#D3663E] font-mono mt-1">22.5 Litres <span class="text-[10px] text-[#4A5568] font-normal">Stock</span></div><div class="text-[10px] text-[#4A5568] mt-0.5">7-Day Demand: <strong class="font-mono text-[#1E232A]">31.5 Litres</strong></div><div class="w-full bg-[#F4F1EA] h-2 rounded-full mt-2 overflow-hidden"><div class="h-full bg-[#D3663E]" style="width: 71%"></div></div></div><div class="pt-2 border-t border-[#2D8A8A]/10 mt-2 text-[10px] font-bold text-[#D3663E]">⚠️ Deficit: 9 Litres</div>
+                                </div>
+                                <div class="p-3.5 bg-[#FDF2EE] border border-[#F5A285]/40 rounded-2xl shadow-sm flex flex-col justify-between">
+                                    <div><div class="flex justify-between items-center mb-1"><span class="font-heading font-extrabold text-sm text-[#D3663E]">AB-</span><span class="text-[9px] font-bold px-2 py-0.5 rounded-full bg-[#FDF2EE] text-[#D3663E] border border-[#F5A285]/30">CRITICAL_DEFICIT</span></div><div class="text-base font-extrabold text-[#D3663E] font-mono mt-1">13.5 Litres <span class="text-[10px] text-[#4A5568] font-normal">Stock</span></div><div class="text-[10px] text-[#4A5568] mt-0.5">7-Day Demand: <strong class="font-mono text-[#1E232A]">18 Litres</strong></div><div class="w-full bg-[#F4F1EA] h-2 rounded-full mt-2 overflow-hidden"><div class="h-full bg-[#D3663E]" style="width: 75%"></div></div></div><div class="pt-2 border-t border-[#2D8A8A]/10 mt-2 text-[10px] font-bold text-[#D3663E]">⚠️ Deficit: 4.5 Litres</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 2. Generic Essential Medicines Stock Supply KPI Grid (Pre-populated) -->
+                        <div class="mb-6">
+                            <h5 class="text-xs font-bold text-[#2D8A8A] mb-3 uppercase tracking-wide">💊 Generic Essential Medicines Stock & Patient Demand</h5>
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3" id="kpi-grid-medicines-demand-supply">
+                                <div class="p-4 bg-white border border-[#2D8A8A]/15 rounded-2xl shadow-sm flex flex-col justify-between">
+                                    <div><div class="flex justify-between items-start mb-2"><div><h5 class="font-heading font-extrabold text-xs text-[#1E232A]">Paracetamol 500mg</h5><span class="text-[10px] text-[#2D8A8A] font-semibold">Analgesic / Antipyretic</span></div><span class="text-[9px] font-bold px-2 py-0.5 rounded-full bg-[#EBF5F5] text-[#2D8A8A]">11.8 Days Reserve</span></div><div class="space-y-1 text-xs text-[#4A5568] mt-2"><div class="flex justify-between"><span>Pharmacy Stock:</span><strong class="font-mono text-[#2D8A8A]">14,200 Units</strong></div><div class="flex justify-between"><span>7-Day Patient Demand:</span><strong class="font-mono text-[#1E232A]">8,400 Units</strong></div></div></div><div class="w-full bg-[#F4F1EA] h-2 rounded-full mt-3 overflow-hidden"><div class="h-full bg-[#2D8A8A]" style="width: 100%"></div></div>
+                                </div>
+                                <div class="p-4 bg-white border border-[#2D8A8A]/15 rounded-2xl shadow-sm flex flex-col justify-between">
+                                    <div><div class="flex justify-between items-start mb-2"><div><h5 class="font-heading font-extrabold text-xs text-[#1E232A]">Amoxicillin 500mg</h5><span class="text-[10px] text-[#2D8A8A] font-semibold">Antibiotic</span></div><span class="text-[9px] font-bold px-2 py-0.5 rounded-full bg-[#EBF5F5] text-[#2D8A8A]">11.3 Days Reserve</span></div><div class="space-y-1 text-xs text-[#4A5568] mt-2"><div class="flex justify-between"><span>Pharmacy Stock:</span><strong class="font-mono text-[#2D8A8A]">6,800 Units</strong></div><div class="flex justify-between"><span>7-Day Patient Demand:</span><strong class="font-mono text-[#1E232A]">4,200 Units</strong></div></div></div><div class="w-full bg-[#F4F1EA] h-2 rounded-full mt-3 overflow-hidden"><div class="h-full bg-[#2D8A8A]" style="width: 100%"></div></div>
+                                </div>
+                                <div class="p-4 bg-white border border-[#2D8A8A]/15 rounded-2xl shadow-sm flex flex-col justify-between">
+                                    <div><div class="flex justify-between items-start mb-2"><div><h5 class="font-heading font-extrabold text-xs text-[#1E232A]">Azithromycin 500mg</h5><span class="text-[10px] text-[#2D8A8A] font-semibold">Broad-Spectrum Antibiotic</span></div><span class="text-[9px] font-bold px-2 py-0.5 rounded-full bg-[#FDF2EE] text-[#D3663E]">6.7 Days Reserve</span></div><div class="space-y-1 text-xs text-[#4A5568] mt-2"><div class="flex justify-between"><span>Pharmacy Stock:</span><strong class="font-mono text-[#2D8A8A]">2,900 Units</strong></div><div class="flex justify-between"><span>7-Day Patient Demand:</span><strong class="font-mono text-[#1E232A]">3,000 Units</strong></div></div></div><div class="w-full bg-[#F4F1EA] h-2 rounded-full mt-3 overflow-hidden"><div class="h-full bg-[#D3663E]" style="width: 64%"></div></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 3. Hospital Ward Beds & ICU KPI Grid (Pre-populated) -->
+                        <div class="mb-6">
+                            <h5 class="text-xs font-bold text-[#2D8A8A] mb-3 uppercase tracking-wide">🏥 Hospital Ward Beds & ICU Capacity Summary</h5>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4" id="kpi-grid-beds-demand-supply">
+                                <div class="p-4 bg-white border border-[#2D8A8A]/15 rounded-2xl shadow-sm">
+                                    <div class="flex justify-between items-center mb-2 pb-2 border-b border-[#2D8A8A]/10"><h5 class="font-heading font-extrabold text-xs text-[#1E232A]">🛏️ General Ward Hospital Beds</h5><span class="text-xs font-bold text-[#2D8A8A] bg-[#EBF5F5] px-2.5 py-0.5 rounded-full">435 Beds Free</span></div>
+                                    <div class="space-y-1.5 text-xs text-[#4A5568]"><div class="flex justify-between"><span>Total Installed Capacity:</span><strong class="font-mono text-[#1E232A]">8,325 Beds</strong></div><div class="flex justify-between"><span>Currently Occupied:</span><strong class="font-mono text-[#F5A285]">6,375 Beds (77%)</strong></div><div class="flex justify-between"><span>Predicted Daily Surge Demand:</span><strong class="font-mono text-[#D3663E]">6,826 Beds</strong></div></div>
+                                    <div class="w-full bg-[#F4F1EA] h-2.5 rounded-full mt-3 overflow-hidden"><div class="h-full bg-[#2D8A8A]" style="width: 77%"></div></div>
+                                </div>
+                                <div class="p-4 bg-white border border-[#2D8A8A]/15 rounded-2xl shadow-sm">
+                                    <div class="flex justify-between items-center mb-2 pb-2 border-b border-[#2D8A8A]/10"><h5 class="font-heading font-extrabold text-xs text-[#1E232A]">🚑 ICU Critical Care Beds</h5><span class="text-xs font-bold text-[#D3663E] bg-[#FDF2EE] px-2.5 py-0.5 rounded-full">78 Free</span></div>
+                                    <div class="space-y-1.5 text-xs text-[#4A5568]"><div class="flex justify-between"><span>Total ICU Capacity:</span><strong class="font-mono text-[#1E232A]">750 Beds</strong></div><div class="flex justify-between"><span>Currently Occupied:</span><strong class="font-mono text-[#F5A285]">585 Beds (78%)</strong></div><div class="flex justify-between"><span>Predicted Critical ICU Demand:</span><strong class="font-mono text-[#D3663E]">637 Beds</strong></div></div>
+                                    <div class="w-full bg-[#F4F1EA] h-2.5 rounded-full mt-3 overflow-hidden"><div class="h-full bg-[#D3663E]" style="width: 78%"></div></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 4. 30-Day Historical Trend & Forward Care Projection Summary -->
+                        <div>
+                            <h5 class="text-xs font-bold text-[#2D8A8A] mb-3 uppercase tracking-wide">📅 30-Day Historical Trend & Forward Care Projection</h5>
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3" id="kpi-grid-trend-forecast-summary">
+                                <div class="p-4 bg-white border border-[#2D8A8A]/15 rounded-2xl shadow-sm"><div class="flex items-center gap-2 mb-1"><span class="text-lg">📊</span><h5 class="font-heading font-extrabold text-xs text-[#1E232A]">Average Occupancy Rate</h5></div><div class="text-xl font-extrabold text-[#2D8A8A] font-mono mt-1">76.5% <span class="text-xs text-[#4A5568] font-normal">Normal Range</span></div><p class="text-[11px] text-[#4A5568] mt-1">Sustained steady load based on 30-day network trends.</p></div>
+                                <div class="p-4 bg-white border border-[#2D8A8A]/15 rounded-2xl shadow-sm"><div class="flex items-center gap-2 mb-1"><span class="text-lg">📈</span><h5 class="font-heading font-extrabold text-xs text-[#1E232A]">Predicted Peak Surge Day</h5></div><div class="text-xl font-extrabold text-[#D3663E] font-mono mt-1">Friday <span class="text-xs text-[#D3663E] font-bold">(82% Occupancy)</span></div><p class="text-[11px] text-[#4A5568] mt-1">+14% anticipated patient admission surge towards weekend.</p></div>
+                                <div class="p-4 bg-white border border-[#2D8A8A]/15 rounded-2xl shadow-sm"><div class="flex items-center gap-2 mb-1"><span class="text-lg">🛡️</span><h5 class="font-heading font-extrabold text-xs text-[#1E232A]">Recommended ICU Buffer</h5></div><div class="text-xl font-extrabold text-[#2D8A8A] font-mono mt-1">+45 Beds <span class="text-xs text-[#2D8A8A] font-bold">Reserve Ready</span></div><p class="text-[11px] text-[#4A5568] mt-1">Recommended critical care reserve buffer for emergency surge capacity.</p></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+
+
+            </section>
+
+            <!-- TAB 6: GATED HOSPITAL STAFF UPDATE PORTAL -->
+            <section class="tab-content hidden" id="tab-hospital-admin">
+                <!-- Gated View: Unauthenticated Personnel Login Panel -->
+                <div class="card p-8 bg-white/90 border border-[#2D8A8A]/10 rounded-3xl max-w-lg mx-auto shadow-xl backdrop-blur-md" id="admin-gated-login-panel">
+                    <div class="text-center mb-6 pb-4 border-b border-[#2D8A8A]/10">
+                        <div class="w-12 h-12 rounded-2xl bg-[#EBF5F5] border border-[#2D8A8A]/20 flex items-center justify-center text-[#2D8A8A] mx-auto mb-3 shadow-sm">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                            </svg>
+                        </div>
+                        <h2 class="text-lg font-heading font-extrabold text-[#1E232A]" id="login-panel-title">Hospital Staff Operations Hub</h2>
+                        <p class="text-xs text-[#4A5568] mt-1" id="login-panel-sub">Authorized personnel enter Hospital Code ID & PIN to update bed capacity.</p>
+                    </div>
+
+                    <form id="form-gated-admin-login" class="space-y-4">
+                        <div class="flex flex-col gap-1">
+                            <label class="text-xs font-semibold text-[#1E232A]">Hospital Code ID</label>
+                            <input type="text" id="gated-login-id" placeholder="e.g. KEM-MUM, SAS-PUN, JJH-MUM..." class="bg-[#F4F1EA] border border-[#2D8A8A]/15 rounded-2xl p-3 text-sm text-[#1E232A] font-mono uppercase outline-none focus:border-[#2D8A8A]" required>
+                        </div>
+
+                        <div class="flex flex-col gap-1">
+                            <label class="text-xs font-semibold text-[#1E232A]">Access PIN</label>
+                            <input type="password" id="gated-login-pin" placeholder="Enter Access PIN" class="bg-[#F4F1EA] border border-[#2D8A8A]/15 rounded-2xl p-3 text-sm text-[#1E232A] font-mono outline-none focus:border-[#2D8A8A]" required>
+                        </div>
+
+                        <div class="text-xs text-[#D3663E] hidden font-semibold" id="gated-login-error"></div>
+
+                        <button type="submit" class="w-full py-3 bg-[#2D8A8A] text-white rounded-full font-bold hover:bg-[#236B6B] transition text-sm shadow-md">
+                            Log In to Staff Operations
+                        </button>
+
+                        <div class="pt-4 border-t border-[#2D8A8A]/10 text-center text-xs">
+                            <span class="text-[#4A5568]">New Healthcare Facility? </span>
+                            <button type="button" id="link-goto-register-facility" class="text-[#2D8A8A] font-bold hover:underline bg-transparent border-0 cursor-pointer">
+                                Register your hospital here &rarr;
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Unlocked View: Authenticated Operational Resource Management Console -->
+                <div class="card p-6 bg-white/90 border border-[#2D8A8A]/10 rounded-3xl mb-6 hidden shadow-xl backdrop-blur-md" id="admin-unlocked-console">
+                    <div class="mb-5 pb-4 border-b border-[#2D8A8A]/10 flex justify-between items-center">
+                        <div>
+                            <h2 class="text-base font-heading font-bold text-[#1E232A] flex items-center gap-2">
+                                <span>📋 Daily & Hourly Bed Availability Update Form</span>
+                                <span class="text-xs bg-[#EBF5F5] text-[#2D8A8A] border border-[#2D8A8A]/20 px-3 py-1 rounded-full font-mono font-bold">STAFF CONSOLE</span>
+                            </h2>
+                            <p class="text-xs text-[#4A5568] mt-0.5">Update numbers for <strong class="text-[#1E232A]" id="unlocked-hosp-name">King Edward Memorial (KEM) Hospital</strong>.</p>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-xs font-mono bg-[#EBF5F5] text-[#2D8A8A] px-3 py-1 rounded-full border border-[#2D8A8A]/20 font-bold" id="unlocked-hosp-id">KEM-MUM</span>
+                            <button class="px-4 py-1.5 bg-[#FDF2EE] text-[#D3663E] border border-[#F5A285]/30 hover:bg-[#F5A285] hover:text-white rounded-full text-xs font-bold transition" id="btn-logout-hospital-admin">
+                                Log Out
+                            </button>
+                        </div>
+                    </div>
+
+                    <form id="form-admin-resource-update" class="space-y-4">
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                            <div class="flex flex-col gap-1">
+                                <label class="text-xs font-semibold text-[#1E232A]">Available Beds Right Now</label>
+                                <input type="number" id="admin-avail-beds" class="bg-[#F4F1EA] border border-[#2D8A8A]/15 rounded-2xl p-2.5 text-sm font-semibold" value="380">
+                            </div>
+
+                            <div class="flex flex-col gap-1">
+                                <label class="text-xs font-semibold text-[#1E232A]">Available ICU Beds</label>
+                                <input type="number" id="admin-avail-icu" class="bg-[#F4F1EA] border border-[#2D8A8A]/15 rounded-2xl p-2.5 text-sm font-semibold" value="28">
+                            </div>
+
+                            <div class="flex flex-col gap-1">
+                                <label class="text-xs font-semibold text-[#1E232A]">Available Oxygen Beds</label>
+                                <input type="number" id="admin-avail-oxygen" class="bg-[#F4F1EA] border border-[#2D8A8A]/15 rounded-2xl p-2.5 text-sm font-semibold" value="180">
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                            <div class="flex flex-col gap-1">
+                                <label class="text-xs font-semibold text-[#1E232A]">Available Ventilators</label>
+                                <input type="number" id="admin-avail-ventilators" class="bg-[#F4F1EA] border border-[#2D8A8A]/15 rounded-2xl p-2.5 text-sm font-semibold" value="12">
+                            </div>
+
+                            <div class="flex flex-col gap-1">
+                                <label class="text-xs font-semibold text-[#1E232A]">Emergency Patient Flow</label>
+                                <select id="admin-er-status" class="bg-[#F4F1EA] border border-[#2D8A8A]/15 rounded-2xl p-2.5 text-sm text-[#1E232A]">
+                                    <option value="NORMAL">Normal Patient Intake</option>
+                                    <option value="LOW_SURGE">Low Surge</option>
+                                    <option value="HIGH_SURGE" selected>High Rush / Busy</option>
+                                    <option value="CRITICAL_OVERFLOW">Critical Capacity Overflow</option>
+                                </select>
+                            </div>
+
+                            <div class="flex flex-col gap-1">
+                                <label class="text-xs font-semibold text-[#1E232A]">Average Emergency Wait (Mins)</label>
+                                <input type="number" id="admin-wait-mins" class="bg-[#F4F1EA] border border-[#2D8A8A]/15 rounded-2xl p-2.5 text-sm font-semibold" value="22">
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                            <div class="flex flex-col gap-1">
+                                <label class="text-xs font-semibold text-[#1E232A]">OPD Waiting Line Count</label>
+                                <input type="number" id="admin-opd-queue" class="bg-[#F4F1EA] border border-[#2D8A8A]/15 rounded-2xl p-2.5 text-sm font-semibold" value="140">
+                            </div>
+
+                            <div class="flex flex-col gap-1">
+                                <label class="text-xs font-semibold text-[#1E232A]">Doctors On Duty Now</label>
+                                <input type="number" id="admin-doctors-duty" class="bg-[#F4F1EA] border border-[#2D8A8A]/15 rounded-2xl p-2.5 text-sm font-semibold" value="85">
+                            </div>
+
+                            <div class="flex items-end">
+                                <button type="submit" class="w-full py-3 bg-[#2D8A8A] text-white rounded-full font-bold hover:bg-[#236B6B] transition text-xs shadow-md">
+                                    Publish Resource Update
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </section>
+
+            <!-- Bottom Page Footer (Only Place Mentioning Maharashtra Region + Made with Love) -->
+            <footer class="py-6 mt-10 border-t border-[#2D8A8A]/10 text-center text-xs text-[#4A5568] font-medium flex flex-col items-center gap-1">
+                <div>MediFlow AI Healthcare Platform &bull; Serving Maharashtra Region</div>
+                <div>Made with ❤️ for Patients & Caregivers</div>
+            </footer>
+        </main>
+    </div>
+
+    <!-- TOAST NOTIFICATION CONTAINER -->
+    <div id="toast-container"></div>
+
+    <!-- Data Manager Script -->
+    <script src="firebase-config.js"></script>
+
+    <!-- Application Controller -->
+    <script src="app.js"></script>
+</body>
+</html>

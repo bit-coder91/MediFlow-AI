@@ -1,0 +1,435 @@
+/* ==========================================================================
+   MediFlow AI - Healthcare Design System (Teal, Peach & Warm Off-White Palette)
+   ========================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap');
+
+:root {
+    /* 1. Palette Variables */
+    --bg-main: #FBF9F6;                       /* Warm, comforting off-white background */
+    --bg-sidebar: rgba(255, 255, 255, 0.95);    /* Soft floating white sidebar */
+    --bg-card: rgba(255, 255, 255, 0.92);      /* Floating card background */
+    --bg-card-solid: #FFFFFF;                  /* Pure card background */
+    --bg-input: #F4F1EA;                      /* Tactile warm input background */
+    
+    --teal-primary: #2D8A8A;                   /* Soft, trusting teal */
+    --teal-hover: #236B6B;                     /* Deeper teal hover */
+    --teal-light: #EBF5F5;                     /* Soft light teal tint */
+    --teal-border: rgba(45, 138, 138, 0.2);     /* Soft teal border */
+
+    --peach-secondary: #F5A285;                /* Gentle, muted peach accent */
+    --peach-hover: #E48F71;                    /* Muted peach hover */
+    --peach-light: #FDF2EE;                    /* Light peach tint */
+    --peach-border: rgba(245, 162, 133, 0.3);  /* Muted peach border */
+
+    --text-primary: #1E232A;                   /* High-contrast, readable deep slate */
+    --text-heading: #12171E;                   /* Bold deep slate heading */
+    --text-muted: #4A5568;                     /* Empathetic muted slate body */
+    --text-subtle: #718096;                    /* Subtle caption text */
+    
+    --border-color: rgba(45, 138, 138, 0.12);
+    --border-hover: rgba(45, 138, 138, 0.28);
+    --shadow-floating: 0 16px 36px -6px rgba(45, 138, 138, 0.08), 0 4px 16px rgba(30, 35, 42, 0.03);
+    
+    --radius-card: 24px;                       /* 24px border radius for zero-gravity floating effect */
+    --radius-pill: 9999px;                     /* Rounded pill shape */
+}
+
+/* ============================================================
+   DARK THEME — Complete, High-Contrast Override System
+   Targets all hardcoded Tailwind colour classes used in the app
+   ============================================================ */
+
+body.dark-theme {
+    --bg-main: #0D1117;
+    --bg-sidebar: rgba(13, 17, 23, 0.98);
+    --bg-card: rgba(22, 30, 46, 0.95);
+    --bg-card-solid: #161E2E;
+    --bg-input: #1A2236;
+
+    --teal-primary: #3DB8B8;
+    --teal-hover: #2D9A9A;
+    --teal-light: rgba(61, 184, 184, 0.18);
+
+    --peach-secondary: #F7B49B;
+    --peach-light: rgba(247, 180, 155, 0.18);
+
+    --text-primary: #F0F4F8;
+    --text-heading: #FFFFFF;
+    --text-muted: #B8C5D6;
+    --text-subtle: #8899AA;
+
+    --border-color: rgba(255, 255, 255, 0.1);
+    --border-hover: rgba(61, 184, 184, 0.35);
+    --shadow-floating: 0 16px 36px -6px rgba(0, 0, 0, 0.5);
+}
+
+/* ── Base layer ── */
+body.dark-theme {
+    background-color: #0D1117 !important;
+    color: #F0F4F8 !important;
+}
+
+/* ── Layout chrome: sidebar, header ── */
+body.dark-theme aside,
+body.dark-theme header {
+    background-color: #161E2E !important;
+    border-color: rgba(255, 255, 255, 0.08) !important;
+    color: #F0F4F8 !important;
+}
+
+/* ── All card surfaces ── */
+body.dark-theme .card,
+body.dark-theme div.card,
+body.dark-theme [class*="bg-white"],
+body.dark-theme [class*="bg-white/"],
+body.dark-theme div[class*="bg-white"] {
+    background-color: #1C2840 !important;
+    border-color: rgba(255, 255, 255, 0.1) !important;
+    color: #F0F4F8 !important;
+}
+
+/* ── Warm tinted mini-card backgrounds (inline KPI cards) ── */
+body.dark-theme div[class*="bg-[#F4F1EA]"],
+body.dark-theme div[class*="bg-[#EBF5F5]"],
+body.dark-theme div[class*="bg-[#FDF2EE]"],
+body.dark-theme [class*="bg-[#F4F1EA]"],
+body.dark-theme [class*="bg-[#EBF5F5]"],
+body.dark-theme [class*="bg-[#FDF2EE]"] {
+    background-color: #1A2640 !important;
+    border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+/* ── Form controls ── */
+body.dark-theme input,
+body.dark-theme select,
+body.dark-theme textarea {
+    background-color: #1A2236 !important;
+    color: #F0F4F8 !important;
+    border-color: rgba(255, 255, 255, 0.18) !important;
+}
+
+body.dark-theme select option {
+    background-color: #1C2840 !important;
+    color: #F0F4F8 !important;
+}
+
+/* ── ALL text must be readable ── */
+body.dark-theme h1, body.dark-theme h2, body.dark-theme h3,
+body.dark-theme h4, body.dark-theme h5, body.dark-theme h6 {
+    color: #FFFFFF !important;
+}
+
+body.dark-theme p,
+body.dark-theme label,
+body.dark-theme li {
+    color: #B8C5D6 !important;
+}
+
+/* ── Hardcoded Tailwind text-colour overrides ── */
+body.dark-theme .text-\[\#1E232A\],
+body.dark-theme .text-\[\#12171E\] {
+    color: #FFFFFF !important;
+}
+
+body.dark-theme .text-\[\#4A5568\],
+body.dark-theme .text-\[\#718096\] {
+    color: #A0B0C4 !important;
+}
+
+body.dark-theme .text-\[\#2D8A8A\] {
+    color: #4DD8D8 !important;
+}
+
+body.dark-theme .text-\[\#D3663E\],
+body.dark-theme .text-\[\#F5A285\] {
+    color: #FFAA80 !important;
+}
+
+body.dark-theme .text-emerald-600,
+body.dark-theme .text-emerald-700 {
+    color: #4ADE80 !important;
+}
+
+body.dark-theme span {
+    color: inherit;
+}
+
+/* ── Badge pill backgrounds (teal & peach tints) ── */
+body.dark-theme [class*="bg-[#EBF5F5]"] {
+    background-color: rgba(61, 184, 184, 0.2) !important;
+}
+
+body.dark-theme [class*="bg-[#FDF2EE]"] {
+    background-color: rgba(247, 180, 155, 0.2) !important;
+}
+
+/* ── Badge text in pill chips ── */
+body.dark-theme [class*="bg-[#EBF5F5]"] span,
+body.dark-theme [class*="bg-[#EBF5F5]"].text-\[\#2D8A8A\] {
+    color: #4DD8D8 !important;
+}
+
+body.dark-theme [class*="bg-[#FDF2EE]"] span,
+body.dark-theme [class*="bg-[#FDF2EE]"].text-\[\#D3663E\] {
+    color: #FFAA80 !important;
+}
+
+/* ── Progress / gauge bar tracks ── */
+body.dark-theme [class*="bg-[#F4F1EA]"].h-2,
+body.dark-theme [class*="bg-[#F4F1EA]"].h-2\.5,
+body.dark-theme [class*="bg-[#F4F1EA]"][class*="rounded-full"] {
+    background-color: #2A3A52 !important;
+}
+
+/* ── Table: headers, rows, borders ── */
+body.dark-theme table {
+    background-color: #161E2E !important;
+    color: #F0F4F8 !important;
+}
+
+body.dark-theme thead,
+body.dark-theme thead tr,
+body.dark-theme thead th {
+    background-color: #0D1117 !important;
+    color: #B8C5D6 !important;
+    border-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+body.dark-theme tbody tr {
+    border-color: rgba(255, 255, 255, 0.06) !important;
+}
+
+body.dark-theme tbody tr:hover {
+    background-color: rgba(61, 184, 184, 0.06) !important;
+}
+
+body.dark-theme tbody td {
+    color: #F0F4F8 !important;
+    border-color: rgba(255, 255, 255, 0.06) !important;
+}
+
+/* ── Borders ── */
+body.dark-theme [class*="border-[#2D8A8A]"] {
+    border-color: rgba(61, 184, 184, 0.25) !important;
+}
+
+body.dark-theme [class*="border-t"],
+body.dark-theme [class*="border-b"] {
+    border-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+/* ── JS-injected innerHTML cards (KPI grids, pharmacy, discovery, blood bank) ── */
+body.dark-theme #kpi-grid-blood-demand-supply > div,
+body.dark-theme #kpi-grid-medicines-demand-supply > div,
+body.dark-theme #kpi-grid-beds-demand-supply > div,
+body.dark-theme #kpi-grid-trend-forecast-summary > div,
+body.dark-theme #pub-analytics-hospital-list > div,
+body.dark-theme #disc-hospital-list > div,
+body.dark-theme #blood-results-container > div,
+body.dark-theme #pharmacy-results-container > div,
+body.dark-theme #forecast-shortage-cards > div {
+    background-color: #1C2840 !important;
+    border-color: rgba(255, 255, 255, 0.1) !important;
+    color: #F0F4F8 !important;
+}
+
+body.dark-theme #kpi-grid-blood-demand-supply h5,
+body.dark-theme #kpi-grid-medicines-demand-supply h5,
+body.dark-theme #kpi-grid-beds-demand-supply h5,
+body.dark-theme #kpi-grid-trend-forecast-summary h5,
+body.dark-theme #kpi-grid-blood-demand-supply span,
+body.dark-theme #kpi-grid-medicines-demand-supply span,
+body.dark-theme #kpi-grid-beds-demand-supply span,
+body.dark-theme #kpi-grid-trend-forecast-summary span {
+    color: inherit !important;
+}
+
+/* ── Govt district analytics table ── */
+body.dark-theme #govt-district-table-body tr {
+    background-color: #1C2840 !important;
+    border-color: rgba(255, 255, 255, 0.06) !important;
+}
+
+body.dark-theme #govt-district-table-body td {
+    color: #F0F4F8 !important;
+}
+
+/* ── Staff login / registration panels ── */
+body.dark-theme [id*="login-panel"],
+body.dark-theme [id*="register-panel"],
+body.dark-theme [id*="forgot-panel"] {
+    background-color: #1C2840 !important;
+    color: #F0F4F8 !important;
+}
+
+/* ── Buttons ── */
+body.dark-theme button:not([class*="bg-[#2D8A8A]"]):not([class*="bg-[#D3663E]"]):not([class*="bg-teal"]) {
+    background-color: #1A2236 !important;
+    color: #F0F4F8 !important;
+    border-color: rgba(255, 255, 255, 0.15) !important;
+}
+
+body.dark-theme button[class*="bg-[#2D8A8A]"],
+body.dark-theme button[class*="bg-teal"] {
+    background-color: #2D9A9A !important;
+    color: #FFFFFF !important;
+}
+
+/* ── Navigation active & hover ── */
+body.dark-theme .nav-item:hover:not(.active) {
+    background-color: rgba(61, 184, 184, 0.12) !important;
+    color: #4DD8D8 !important;
+}
+
+/* ── Dividers & subtle lines ── */
+body.dark-theme hr {
+    border-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+/* ── Placeholder text ── */
+body.dark-theme input::placeholder,
+body.dark-theme textarea::placeholder {
+    color: #556677 !important;
+}
+
+
+/* Global Typography & Tone */
+body {
+    background-color: var(--bg-main) !important;
+    color: var(--text-primary) !important;
+    font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important;
+    -webkit-font-smoothing: antialiased;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Plus Jakarta Sans', sans-serif !important;
+    color: var(--text-heading);
+    letter-spacing: -0.01em;
+}
+
+p, span, label, input, select, button {
+    color: var(--text-primary);
+}
+
+/* Floating Elevated Cards with 24px Radius & Soft Shadows */
+.card, [class*="card"] {
+    border-radius: var(--radius-card) !important;
+    background-color: var(--bg-card) !important;
+    border: 1px solid var(--border-color) !important;
+    box-shadow: var(--shadow-floating) !important;
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.25s ease;
+}
+
+.card:hover {
+    border-color: var(--border-hover) !important;
+    transform: translateY(-2px);
+    box-shadow: 0 20px 44px -8px rgba(45, 138, 138, 0.14), 0 6px 20px rgba(30, 35, 42, 0.04) !important;
+}
+
+/* Buttons & Controls */
+button.btn-primary, button[type="submit"] {
+    border-radius: var(--radius-pill) !important;
+    background-color: var(--teal-primary) !important;
+    color: #FFFFFF !important;
+    font-weight: 700;
+    padding: 0.75rem 1.5rem;
+    transition: all 0.2s ease;
+}
+
+button.btn-primary:hover, button[type="submit"]:hover {
+    background-color: var(--teal-hover) !important;
+    transform: translateY(-1px);
+}
+
+/* Sidebar Styling & Navigation */
+.sidebar {
+    background-color: var(--bg-sidebar) !important;
+    border-right: 1px solid var(--border-color) !important;
+}
+
+.nav-item {
+    border-radius: var(--radius-pill) !important;
+    transition: all 0.2s ease;
+}
+
+.nav-item.active, .nav-item.active span {
+    background-color: var(--teal-primary) !important;
+    color: #FFFFFF !important;
+    font-weight: 700;
+}
+
+.nav-item.active svg {
+    color: #FFFFFF !important;
+}
+
+.nav-item:hover:not(.active) {
+    background-color: var(--teal-light) !important;
+    color: var(--teal-primary) !important;
+}
+
+/* Inputs & Form Controls */
+input, select, textarea {
+    border-radius: 16px !important;
+    background-color: var(--bg-input) !important;
+    border: 1px solid var(--border-color) !important;
+    color: var(--text-primary) !important;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+input:focus, select:focus, textarea:focus {
+    border-color: var(--teal-primary) !important;
+    box-shadow: 0 0 0 3px var(--teal-light) !important;
+    outline: none;
+}
+
+/* Leaflet Map */
+#leaflet-map {
+    height: 360px;
+    width: 100%;
+    border-radius: 20px !important;
+    z-index: 10;
+    border: 1px solid var(--border-color);
+}
+
+/* Tab Switching */
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block !important;
+    animation: fadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Toast Notifications */
+#toast-container {
+    position: fixed;
+    bottom: 1.5rem;
+    right: 1.5rem;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    pointer-events: none;
+}
+
+.toast {
+    pointer-events: auto;
+    border-radius: 16px !important;
+    box-shadow: 0 12px 30px rgba(30, 35, 42, 0.12);
+    animation: slideInRight 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes slideInRight {
+    from { transform: translateX(100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
