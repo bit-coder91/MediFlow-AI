@@ -2,6 +2,14 @@
 
 **IEEE-Style Technical Project Documentation & Comprehensive Market Gap Analysis**
 
+[![Live Application](https://img.shields.io/badge/Live_Deployment-medi--flow--ai--three.vercel.app-000000?style=for-the-badge&logo=vercel&logoColor=white)](https://medi-flow-ai-three.vercel.app/)
+[![Python](https://img.shields.io/badge/Python-3.10%2B-3776AB?style=flat-square&logo=python)](https://python.org)
+[![Flask](https://img.shields.io/badge/Flask-3.x-000000?style=flat-square&logo=flask)](https://flask.palletsprojects.com)
+[![Scikit-Learn](https://img.shields.io/badge/Scikit--Learn-1.4-F7931E?style=flat-square&logo=scikit-learn)](https://scikit-learn.org)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green?style=flat-square)](LICENSE)
+
+> 🌐 **Live Production Deployment:** [https://medi-flow-ai-three.vercel.app/](https://medi-flow-ai-three.vercel.app/)
+
 ---
 
 ### **Abstract**
